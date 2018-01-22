@@ -1,12 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>fraunhofer</groupId>
-  <artifactId>doeeet-users-logs</artifactId>
+  <artifactId>mahoutdataproducer</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>doeeetuserlog</name>
+  <name>Mahout Data Producer</name>
   <description>Parse the doEEEt users log files and creates a file that can be used by Apache Mahout to make recommendations.</description>
   <properties>
-  	<finalName>jsontransformer</finalName>
+  	<finalName>mahoutdataproducer</finalName>
   	<main.class>de.fraunhofer.cortex.json.Main</main.class>
   	<maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
