@@ -35,7 +35,7 @@ public class Main {
 	  CommandLine cmd = getCommandLine(options, args);
 	  String mahoutFileName = cmd.getOptionValue(MAHOUT_DATA_FILE);
 	  File mahoutDataFile = new File(mahoutFileName);
-	  // at least one type of signals (views, downloads, comparisons)
+	  // at least one type of signals (views, downloads, comparisons) must be available
 	  if(! (cmd.hasOption(VIEWS_FOLDER_OPTION) | 
 	        cmd.hasOption(DOWNLOADS_FOLDER_OPTION) | 
 	        cmd.hasOption(COMPARISONS_FOLDER_OPTION))) {
