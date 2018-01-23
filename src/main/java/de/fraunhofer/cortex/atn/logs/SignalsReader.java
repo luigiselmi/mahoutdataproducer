@@ -70,6 +70,32 @@ public class SignalsReader {
   }
   
   /**
+   * Extracts userIDs, itemIDs from the comparison events 
+   * and sets the value to 1.0 from the user for each comparison.
+   * One user generates one event for each item in a comparison. 
+   * navigation data.
+   * @return
+   * @throws IOException
+   */
+  public static List<SignalRecord> readComparisonsFiles(File dir) throws IOException {
+    List<SignalRecord> signals = new ArrayList<SignalRecord>();
+    File[] logFiles = dir.listFiles();
+    for (int i = 0; i < logFiles.length; i++) {
+      if (logFiles[i].isFile()) {
+        List<String> lines = FileUtils.readLines(logFiles[i], "UTF-8");
+        for(String line: lines) {
+          List<SignalRecord> signalsFromOneUser = JSONTransformer.parseComparisons(line);
+          signals.addAll(signalsFromOneUser);
+          //System.out.print("Atn Item ID: " + signal.atnItemID);
+          //System.out.println(" User ID: " + signal.getUserID());
+        }
+      
+      }
+    }
+    return signals;
+  }
+  
+  /**
    * Copies the string item IDs into an array list
    * @param records
    * @return

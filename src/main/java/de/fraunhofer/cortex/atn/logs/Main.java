@@ -24,6 +24,7 @@ public class Main {
 	
   static final String VIEWS_FOLDER_OPTION = "views";
 	static final String DOWNLOADS_FOLDER_OPTION = "downloads";
+	static final String COMPARISONS_FOLDER_OPTION = "comparisons";
 	static final String MAHOUT_DATA_FILE = "output";
 	
 	private static Options options;
@@ -34,7 +35,10 @@ public class Main {
 	  CommandLine cmd = getCommandLine(options, args);
 	  String mahoutFileName = cmd.getOptionValue(MAHOUT_DATA_FILE);
 	  File mahoutDataFile = new File(mahoutFileName);
-	  if(! (cmd.hasOption(VIEWS_FOLDER_OPTION) | cmd.hasOption(DOWNLOADS_FOLDER_OPTION))) {
+	  // at least one type of signals (views, downloads, comparisons)
+	  if(! (cmd.hasOption(VIEWS_FOLDER_OPTION) | 
+	        cmd.hasOption(DOWNLOADS_FOLDER_OPTION) | 
+	        cmd.hasOption(COMPARISONS_FOLDER_OPTION))) {
       help(options);
       System.exit(0);
     }
@@ -55,6 +59,14 @@ public class Main {
       allSignals.addAll(downloadsRecords);
     }
 	  
+	  if(cmd.hasOption(COMPARISONS_FOLDER_OPTION)) {
+      File dir = new File(cmd.getOptionValue(COMPARISONS_FOLDER_OPTION));
+      // read the comparisons log files
+      List<SignalRecord> comparisonsRecords = SignalsReader.readComparisonsFiles(dir);
+      allSignals.addAll(comparisonsRecords);
+    }
+	  
+	  // group signals (records with same userID and itemID)
 	  List<SignalRecord> keyedSignals = SignalsReader.groupRecordsByKey(allSignals);
 	  SignalsReader.createSignalsFile(keyedSignals, mahoutDataFile);
 	  
@@ -81,11 +93,13 @@ public class Main {
 	  options = new Options();
 	  Option signalsFile = new Option("output", true, "path to the output file, mandatory");
 	  signalsFile.setRequired(true);
-	  Option viewsFolder = new Option("views", true, "folder containing the views log files");
-	  Option downladsFolder = new Option("downloads", true, "folder containing the downloads log files");
+	  Option viewsFolder = new Option(VIEWS_FOLDER_OPTION, true, "folder containing the views log files");
+	  Option downladsFolder = new Option(DOWNLOADS_FOLDER_OPTION, true, "folder containing the downloads log files");
+	  Option comparisonsFolder = new Option(COMPARISONS_FOLDER_OPTION, true, "folder containing the comparisons log files");
 	  options.addOption(signalsFile);
 	  options.addOption(viewsFolder);
 	  options.addOption(downladsFolder);
+	  options.addOption(comparisonsFolder);
 	  return options;
 	  
 	}
