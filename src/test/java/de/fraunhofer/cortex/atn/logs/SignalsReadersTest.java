@@ -15,31 +15,29 @@ import de.fraunhofer.cortex.atn.logs.SignalsReader;
 public class SignalsReadersTest {
 
   File dir = null;
-  SignalsReader reader = null;
   
   @Before
   public void setUp() throws Exception {
     dir = new File(this.getClass().getClassLoader().getResource("views").getFile());
-    reader = new SignalsReader(dir);
   }
 
   @Test
-  public void testReadFiles() throws IOException {
-    reader.readFiles();
+  public void testReadViewsFiles() throws IOException {
+    SignalsReader.readViewsFiles(dir);
   }
   
   @Test
   public void testKeyedSignals() throws IOException {
-    List<SignalRecord> signals = reader.readFiles();
-    List<SignalRecord> keyedSignals = reader.groupRecordsByKey(signals);
+    List<SignalRecord> signals = SignalsReader.readViewsFiles(dir);
+    List<SignalRecord> keyedSignals = SignalsReader.groupRecordsByKey(signals);
   }
   
   @Test
   public void testCreateSignalsFile() throws IOException {
     File signalsFile = new File(new File(System.getProperty("java.io.tmpdir")), "signals.csv");
-    List<SignalRecord> signals = reader.readFiles();
-    List<SignalRecord> keyedSignals = reader.groupRecordsByKey(signals);
-    reader.createSignalsFile(keyedSignals, signalsFile);
+    List<SignalRecord> signals = SignalsReader.readViewsFiles(dir);
+    List<SignalRecord> keyedSignals = SignalsReader.groupRecordsByKey(signals);
+    SignalsReader.createSignalsFile(keyedSignals, signalsFile);
   }
 
 }

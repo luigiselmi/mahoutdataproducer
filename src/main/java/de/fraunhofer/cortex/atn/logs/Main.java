@@ -3,47 +3,61 @@ package de.fraunhofer.cortex.atn.logs;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
-
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.mahout.cf.taste.common.TasteException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
 public class Main {
-	static final Logger LOG = LoggerFactory.getLogger(Main.class);
-	private static String userLogsFolder;
-	private static String signalsFilePath;
+	
+  static final Logger LOG = LoggerFactory.getLogger(Main.class);
+	
+  static final String VIEWS_FOLDER_OPTION = "views";
+	static final String DOWNLOADS_FOLDER_OPTION = "downloads";
+	static final String MAHOUT_DATA_FILE = "output";
+	
+	private static Options options;
 	
 	public static void main(String[] args) throws IOException, TasteException {
-	  if (args.length < 2) {
-	    throw new NumberFormatException("The application needs:\n 1) the path to the log files \n 2) the path to the signals file");
+	  
+	  Options options = createOptions();
+	  CommandLine cmd = getCommandLine(options, args);
+	  String mahoutFileName = cmd.getOptionValue(MAHOUT_DATA_FILE);
+	  File mahoutDataFile = new File(mahoutFileName);
+	  if(! (cmd.hasOption(VIEWS_FOLDER_OPTION) | cmd.hasOption(DOWNLOADS_FOLDER_OPTION))) {
+      help(options);
+      System.exit(0);
+    }
+	  
+	  List<SignalRecord> allSignals = new ArrayList<SignalRecord>();
+	  
+	  if(cmd.hasOption(VIEWS_FOLDER_OPTION)) {
+	    File dir = new File(cmd.getOptionValue(VIEWS_FOLDER_OPTION));
+	    // read the views log files
+	    List<SignalRecord> viewsRecords = SignalsReader.readViewsFiles(dir);
+	    allSignals.addAll(viewsRecords);
 	  }
 	  
-	  userLogsFolder = args[0];
-	  signalsFilePath = args[1];
+	  if(cmd.hasOption(DOWNLOADS_FOLDER_OPTION)) {
+      File dir = new File(cmd.getOptionValue(DOWNLOADS_FOLDER_OPTION));
+      // read the downloads log files
+      List<SignalRecord> downloadsRecords = SignalsReader.readDownloadsFiles(dir);
+      allSignals.addAll(downloadsRecords);
+    }
 	  
-	  Main main = new Main();
-	  // 1) read config file
-	  ApplicationConfig config = main.readConfiguration(); 
-	  //userLogsFolder = config.getUserLogsFolder();
-	  //signalsFilePath = config.getSignalsFile();
-	  File dir = new File(userLogsFolder);
+	  List<SignalRecord> keyedSignals = SignalsReader.groupRecordsByKey(allSignals);
+	  SignalsReader.createSignalsFile(keyedSignals, mahoutDataFile);
 	  
-	  SignalsReader signalsReader = new SignalsReader(dir);
-	  // 2) read the log files
-	  List<SignalRecord> signalsRecords = signalsReader.readFiles();
-	  // 3) Count the signals: items a user has seen
-	  List<SignalRecord> keyedSignals = signalsReader.groupRecordsByKey(signalsRecords);
-	  // 4) save the signals in a file
-	  File signalsFile = new File(signalsFilePath);
-	  signalsReader.createSignalsFile(keyedSignals, signalsFile);
-    
 	}
 	
 	
@@ -63,5 +77,35 @@ public class Main {
     return config;
 	}
 	
+	private static Options createOptions() {
+	  options = new Options();
+	  Option signalsFile = new Option("output", true, "path to the output file, mandatory");
+	  signalsFile.setRequired(true);
+	  Option viewsFolder = new Option("views", true, "folder containing the views log files");
+	  Option downladsFolder = new Option("downloads", true, "folder containing the downloads log files");
+	  options.addOption(signalsFile);
+	  options.addOption(viewsFolder);
+	  options.addOption(downladsFolder);
+	  return options;
+	  
+	}
 	
+	private static CommandLine getCommandLine(final Options options, final String [] args) {
+	  CommandLineParser parser = new DefaultParser();
+	  CommandLine line = null;
+    try {
+      line = parser.parse(options, args);
+    } 
+    catch (ParseException pe) {
+      System.out.println("Unable to process command line options: " + pe.getMessage());
+    }
+    
+	  return line;
+	}
+	
+	private static void help(final Options options) {
+	  final HelpFormatter formatter = new HelpFormatter();
+	  formatter.printHelp("User navigation data extractor. At least one folder containing the "
+	      + "event data (e.g. views, downloads, ..) must be passed as an argument.", options);
+	}
 }

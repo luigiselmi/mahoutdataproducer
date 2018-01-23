@@ -25,7 +25,7 @@ public class JSONTransformer {
 	
 	static final Logger LOG = LoggerFactory.getLogger(JSONTransformer.class);
 	
-	public static SignalRecord parseComponentView(String line) {
+	public static SignalRecord parseViews(String line) {
 	  JsonReader jsonReader = Json.createReader(new StringReader(line));
 	  JsonObject json = jsonReader.readObject(); 
 	  // userid
@@ -36,29 +36,22 @@ public class JSONTransformer {
     String atnItemID = originalComponent.getString("componentId");
 	  // value
     double value = 1.0;
-
     SignalRecord signal = new SignalRecord(userID, atnItemID, value);
-    
 	  return signal;
 	}
 	
-	public static SignalRecord parseComponentDownload(String line) {
+	public static SignalRecord parseDownloads(String line) {
     JsonReader jsonReader = Json.createReader(new StringReader(line));
     JsonObject json = jsonReader.readObject();
     JsonValue time = json.get("time");
-    
     JsonValue sessionId = json.get("sessionId");
-    
     JsonObject component = json.getJsonObject("componet");
-    String atnItemID = component.getString("componentId");
+    String atnItemID = component.getString("componetId");
     JsonValue family = component.get("family");
-    
     JsonObject user = json.get("user").asJsonObject();
     long userID = Long.parseLong(user.getString("userId"));
-    
     // value
     double value = 1.0;
-    
     SignalRecord signal = new SignalRecord(userID, atnItemID, value);
     return signal;
   }
