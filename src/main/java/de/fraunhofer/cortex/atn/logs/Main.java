@@ -44,25 +44,27 @@ public class Main {
     }
 	  
 	  List<SignalRecord> allSignals = new ArrayList<SignalRecord>();
+	  ApplicationConfig config = readConfiguration();
+	  SignalsReader reader = new SignalsReader(config);
 	  
 	  if(cmd.hasOption(VIEWS_FOLDER_OPTION)) {
 	    File dir = new File(cmd.getOptionValue(VIEWS_FOLDER_OPTION));
 	    // read the views log files
-	    List<SignalRecord> viewsRecords = SignalsReader.readViewsFiles(dir);
+	    List<SignalRecord> viewsRecords = reader.readViewsFiles(dir);
 	    allSignals.addAll(viewsRecords);
 	  }
 	  
 	  if(cmd.hasOption(DOWNLOADS_FOLDER_OPTION)) {
       File dir = new File(cmd.getOptionValue(DOWNLOADS_FOLDER_OPTION));
       // read the downloads log files
-      List<SignalRecord> downloadsRecords = SignalsReader.readDownloadsFiles(dir);
+      List<SignalRecord> downloadsRecords = reader.readDownloadsFiles(dir);
       allSignals.addAll(downloadsRecords);
     }
 	  
 	  if(cmd.hasOption(COMPARISONS_FOLDER_OPTION)) {
       File dir = new File(cmd.getOptionValue(COMPARISONS_FOLDER_OPTION));
       // read the comparisons log files
-      List<SignalRecord> comparisonsRecords = SignalsReader.readComparisonsFiles(dir);
+      List<SignalRecord> comparisonsRecords = reader.readComparisonsFiles(dir);
       allSignals.addAll(comparisonsRecords);
     }
 	  
@@ -70,23 +72,6 @@ public class Main {
 	  List<SignalRecord> keyedSignals = SignalsReader.groupRecordsByKey(allSignals);
 	  SignalsReader.createSignalsFile(keyedSignals, mahoutDataFile);
 	  
-	}
-	
-	
-	/**
-	 * Reads the configuration file
-	 * @return
-	 * @throws IOException
-	 */
-	private ApplicationConfig readConfiguration() throws IOException {
-	  ApplicationConfig config = new ApplicationConfig();
-	  Properties prop = new Properties();
-    InputStream configIs = Main.class.getClassLoader().getResourceAsStream("config.properties");
-    prop.load(configIs);
-    config.setUserLogsFolder( prop.getProperty("userlogs.views.folder") );
-    config.setSignalsFile(new File(prop.getProperty("signals.file")));
-    
-    return config;
 	}
 	
 	private static Options createOptions() {
@@ -122,4 +107,26 @@ public class Main {
 	  formatter.printHelp("User navigation data extractor. At least one folder containing the "
 	      + "event data (e.g. views, downloads, ..) must be passed as an argument.", options);
 	}
+	
+	/**
+   * Reads the configuration file
+   * @return
+   * @throws IOException
+   */
+  
+  private static ApplicationConfig readConfiguration() throws IOException {
+    ApplicationConfig config = new ApplicationConfig();
+    Properties prop = new Properties();
+    InputStream configIs = JSONTransformer.class.getClassLoader().getResourceAsStream("config.properties");
+    prop.load(configIs);
+    double maxValue = Double.parseDouble(prop.getProperty("value.max"));
+    double downloadValue = Double.parseDouble(prop.getProperty("value.download"));
+    double viewValue = Double.parseDouble(prop.getProperty("value.view"));
+    double comparisonValue = Double.parseDouble(prop.getProperty("value.comparison"));
+    config.setMaxValue(maxValue);
+    config.setValueDownload(downloadValue);
+    config.setValueView(viewValue);
+    config.setValueComparison(comparisonValue);
+    return config;
+  }
 }

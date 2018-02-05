@@ -10,6 +10,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.UUID;
 
 import javax.json.Json;
@@ -26,8 +27,14 @@ import org.slf4j.LoggerFactory;
 public class JSONTransformer {
 	
 	static final Logger LOG = LoggerFactory.getLogger(JSONTransformer.class);
+	private ApplicationConfig config;
 	
-	public static SignalRecord parseViews(String line) {
+	public JSONTransformer(ApplicationConfig config) throws IOException {
+	  this.config = config;
+	}
+	
+	
+	public SignalRecord parseViews(String line) {
 	  JsonReader jsonReader = Json.createReader(new StringReader(line));
 	  JsonObject json = jsonReader.readObject(); 
 	  // userid
@@ -37,12 +44,12 @@ public class JSONTransformer {
     JsonObject originalComponent = json.get("originalComponet").asJsonObject();
     String atnItemID = originalComponent.getString("componentId");
 	  // value
-    double value = 1.0;
+    double value = config.getValueView();
     SignalRecord signal = new SignalRecord(userID, atnItemID, value);
 	  return signal;
 	}
 	
-	public static SignalRecord parseDownloads(String line) {
+	public SignalRecord parseDownloads(String line) {
     JsonReader jsonReader = Json.createReader(new StringReader(line));
     JsonObject json = jsonReader.readObject();
     JsonValue time = json.get("time");
@@ -53,12 +60,12 @@ public class JSONTransformer {
     JsonObject user = json.get("user").asJsonObject();
     long userID = Long.parseLong(user.getString("userId"));
     // value
-    double value = 1.0;
+    double value = config.getValueDownload();
     SignalRecord signal = new SignalRecord(userID, atnItemID, value);
     return signal;
   }
 	
-  public static List<SignalRecord> parseComparisons(String line) {
+  public List<SignalRecord> parseComparisons(String line) {
     List<SignalRecord> signals = new ArrayList<SignalRecord>();
     JsonReader jsonReader = Json.createReader(new StringReader(line));
     JsonObject json = jsonReader.readObject();
@@ -71,7 +78,7 @@ public class JSONTransformer {
       JsonObject component = components.get(i).asJsonObject();
       String atnItemId = component.getString("componentId");
       //JsonValue family = component.get("family");
-      double value = 1.0;
+      double value = config.getValueComparison();
       SignalRecord signal = new SignalRecord(userID, atnItemId, value);
       signals.add(signal);
     }
@@ -92,5 +99,5 @@ public class JSONTransformer {
 		   in.close();
 		 }
 	}
-
+  
 }

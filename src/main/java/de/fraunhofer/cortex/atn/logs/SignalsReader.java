@@ -17,6 +17,14 @@ import org.apache.commons.io.FileUtils;
 
 public class SignalsReader {
   
+  JSONTransformer transformer = null;
+  ApplicationConfig config;
+  
+  public SignalsReader(ApplicationConfig config) throws IOException {
+    this.config = config;
+    transformer = new JSONTransformer(config);
+  }
+  
   /**
    * Extracts userIDs, itemIDs from the views events 
    * and sets the value to 1.0 from the user.
@@ -25,17 +33,16 @@ public class SignalsReader {
    * @return
    * @throws IOException
    */
-  public static List<SignalRecord> readViewsFiles(File dir) throws IOException {
+  public List<SignalRecord> readViewsFiles(File dir) throws IOException {
     List<SignalRecord> signals = new ArrayList<SignalRecord>();
     File[] logFiles = dir.listFiles();
     for (int i = 0; i < logFiles.length; i++) {
       if (logFiles[i].isFile()) {
         List<String> lines = FileUtils.readLines(logFiles[i], "UTF-8");
         for(String line: lines) {
-          SignalRecord signal = JSONTransformer.parseViews(line);
+          SignalRecord signal = transformer.parseViews(line);
           signals.add(signal);
-          System.out.print("Atn Item ID: " + signal.atnItemID);
-          System.out.println(" User ID: " + signal.getUserID());
+          
         }
       
       }
@@ -51,17 +58,16 @@ public class SignalsReader {
    * @return
    * @throws IOException
    */
-  public static List<SignalRecord> readDownloadsFiles(File dir) throws IOException {
+  public List<SignalRecord> readDownloadsFiles(File dir) throws IOException {
     List<SignalRecord> signals = new ArrayList<SignalRecord>();
     File[] logFiles = dir.listFiles();
     for (int i = 0; i < logFiles.length; i++) {
       if (logFiles[i].isFile()) {
         List<String> lines = FileUtils.readLines(logFiles[i], "UTF-8");
         for(String line: lines) {
-          SignalRecord signal = JSONTransformer.parseDownloads(line);
+          SignalRecord signal = transformer.parseDownloads(line);
           signals.add(signal);
-          System.out.print("Atn Item ID: " + signal.atnItemID);
-          System.out.println(" User ID: " + signal.getUserID());
+          
         }
       
       }
@@ -77,17 +83,16 @@ public class SignalsReader {
    * @return
    * @throws IOException
    */
-  public static List<SignalRecord> readComparisonsFiles(File dir) throws IOException {
+  public List<SignalRecord> readComparisonsFiles(File dir) throws IOException {
     List<SignalRecord> signals = new ArrayList<SignalRecord>();
     File[] logFiles = dir.listFiles();
     for (int i = 0; i < logFiles.length; i++) {
       if (logFiles[i].isFile()) {
         List<String> lines = FileUtils.readLines(logFiles[i], "UTF-8");
         for(String line: lines) {
-          List<SignalRecord> signalsFromOneUser = JSONTransformer.parseComparisons(line);
+          List<SignalRecord> signalsFromOneUser = transformer.parseComparisons(line);
           signals.addAll(signalsFromOneUser);
-          //System.out.print("Atn Item ID: " + signal.atnItemID);
-          //System.out.println(" User ID: " + signal.getUserID());
+          
         }
       
       }
