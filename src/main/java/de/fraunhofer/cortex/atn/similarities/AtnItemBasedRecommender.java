@@ -33,16 +33,6 @@ public class AtnItemBasedRecommender implements ItemBasedRecommender {
   private final Recommender recommender;
   private de.fraunhofer.cortex.atn.logs.SignalsDataModel dataModel;
   
-  /*
-  public AtnItemBasedRecommender() throws TasteException, IOException {
-    ApplicationConfig config = readConfiguration();
-    File dataFile = config.getSignalsFile();
-    dataModel = new SignalsDataModel(dataFile);
-    ItemSimilarity similarity = new CachingItemSimilarity(new PearsonCorrelationSimilarity(dataModel), dataModel);
-    recommender = new GenericItemBasedRecommender(dataModel, similarity);
-    LOG.info("Item Based Recommender ready");
-  }
-  */
   
  //used for testing
  public AtnItemBasedRecommender(File dataFile) throws TasteException, IOException {
