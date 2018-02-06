@@ -15,21 +15,25 @@ import org.apache.mahout.cf.taste.impl.similarity.LogLikelihoodSimilarity;
 import org.apache.mahout.cf.taste.impl.similarity.PearsonCorrelationSimilarity;
 import org.apache.mahout.cf.taste.model.DataModel;
 import org.apache.mahout.cf.taste.recommender.IDRescorer;
+import org.apache.mahout.cf.taste.recommender.ItemBasedRecommender;
 import org.apache.mahout.cf.taste.recommender.RecommendedItem;
 import org.apache.mahout.cf.taste.recommender.Recommender;
+import org.apache.mahout.cf.taste.recommender.Rescorer;
 import org.apache.mahout.cf.taste.similarity.ItemSimilarity;
+import org.apache.mahout.common.LongPair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.fraunhofer.cortex.atn.logs.ApplicationConfig;
 import de.fraunhofer.cortex.atn.logs.SignalsDataModel;
 
-public class AtnItemBasedRecommender implements Recommender {
+public class AtnItemBasedRecommender implements ItemBasedRecommender {
   
   static final Logger LOG = LoggerFactory.getLogger(AtnItemBasedRecommender.class);
   private final Recommender recommender;
   private de.fraunhofer.cortex.atn.logs.SignalsDataModel dataModel;
   
+  /*
   public AtnItemBasedRecommender() throws TasteException, IOException {
     ApplicationConfig config = readConfiguration();
     File dataFile = config.getSignalsFile();
@@ -38,6 +42,15 @@ public class AtnItemBasedRecommender implements Recommender {
     recommender = new GenericItemBasedRecommender(dataModel, similarity);
     LOG.info("Item Based Recommender ready");
   }
+  */
+  
+ //used for testing
+ public AtnItemBasedRecommender(File dataFile) throws TasteException, IOException {
+   dataModel = new SignalsDataModel(dataFile);
+   ItemSimilarity similarity = new CachingItemSimilarity(new PearsonCorrelationSimilarity(dataModel), dataModel);
+   recommender = new GenericItemBasedRecommender(dataModel, similarity);
+   LOG.info("Item Based Recommender ready");
+ }
 
   @Override
   public void refresh(Collection<Refreshable> alreadyRefreshed) {
@@ -92,26 +105,51 @@ public class AtnItemBasedRecommender implements Recommender {
     return this.dataModel;
   }
 
-  /**
-   * Reads the configuration file
-   * @return
-   * @throws IOException
-   */
-  private ApplicationConfig readConfiguration() throws IOException {
-    ApplicationConfig config = new ApplicationConfig();
-    File signalsFile;
-    Properties prop = new Properties();
-    InputStream configIs = AtnItemBasedRecommender.class.getClassLoader().getResourceAsStream("config.properties");
-    prop.load(configIs);
-    boolean applicationUndertest = "true".equals(prop.getProperty("application.test"));
-    if(applicationUndertest) {
-      signalsFile = new File(this.getClass().getClassLoader().getResource("signals_test.csv").getFile());
-      config.setSignalsFile(signalsFile);
-    }
-    else {
-      signalsFile = new File(prop.getProperty("signals.file"));
-      config.setSignalsFile(signalsFile);
-    }
-    return config;
+  
+
+  @Override
+  public List<RecommendedItem> mostSimilarItems(long itemID, int howMany) throws TasteException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public List<RecommendedItem> mostSimilarItems(long itemID, int howMany, Rescorer<LongPair> rescorer)
+      throws TasteException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public List<RecommendedItem> mostSimilarItems(long[] itemIDs, int howMany) throws TasteException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public List<RecommendedItem> mostSimilarItems(long[] itemIDs, int howMany, Rescorer<LongPair> rescorer)
+      throws TasteException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public List<RecommendedItem> mostSimilarItems(long[] itemIDs, int howMany, boolean excludeItemIfNotSimilarToAll)
+      throws TasteException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public List<RecommendedItem> mostSimilarItems(long[] itemIDs, int howMany, Rescorer<LongPair> rescorer,
+      boolean excludeItemIfNotSimilarToAll) throws TasteException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public List<RecommendedItem> recommendedBecause(long userID, long itemID, int howMany) throws TasteException {
+    // TODO Auto-generated method stub
+    return null;
   }
 }
