@@ -24,6 +24,7 @@ public class SignalsReadersTest {
     config = new ApplicationConfig();
     config = new ApplicationConfig();
     config.setMaxValue(5.0);
+    config.setMinValue(1.0);
     reader = new SignalsReader(config);
     
   }
@@ -36,15 +37,25 @@ public class SignalsReadersTest {
   @Test
   public void testKeyedSignals() throws IOException {
     List<SignalRecord> signals = reader.readViewsFiles(dir);
-    List<SignalRecord> keyedSignals = SignalsReader.groupRecordsByKey(signals);
+    List<SignalRecord> keyedSignals = reader.groupRecordsByKey(signals);
   }
+  
   
   @Test
   public void testCreateSignalsFile() throws IOException {
     File signalsFile = new File(new File(System.getProperty("java.io.tmpdir")), "signals.csv");
+    File normalizedSignalsFile = new File(new File(System.getProperty("java.io.tmpdir")), "normalized_signals.csv");
     List<SignalRecord> signals = reader.readViewsFiles(dir);
-    List<SignalRecord> keyedSignals = SignalsReader.groupRecordsByKey(signals);
-    SignalsReader.createSignalsFile(keyedSignals, signalsFile);
+    List<SignalRecord> keyedSignals = reader.groupRecordsByKey(signals);
+    reader.createSignalsFile(keyedSignals, signalsFile);
+    List<SignalRecord> normalizedSignals = reader.normalizeList(keyedSignals);
+    reader.createSignalsFile(normalizedSignals, normalizedSignalsFile);
+  }
+  
+  @Test
+  public void testNormalize() {
+    assertTrue(reader.normalize(4.0) == 0.5);
+    assertTrue(reader.normalize(10.0) == 1.0);
   }
 
 }

@@ -68,9 +68,15 @@ public class Main {
       allSignals.addAll(comparisonsRecords);
     }
 	  
-	  // group signals (records with same userID and itemID)
-	  List<SignalRecord> keyedSignals = SignalsReader.groupRecordsByKey(allSignals);
-	  SignalsReader.createSignalsFile(keyedSignals, mahoutDataFile);
+	  // Aggregate signals, i.e. records with same pair userID and itemID. 
+	  // The total value is the sum of all the values
+	  List<SignalRecord> keyedSignals = reader.groupRecordsByKey(allSignals);
+	  
+	  // normalize the values in the signals file
+	  List<SignalRecord> normalizedSignals = reader.normalizeList(keyedSignals);
+	  
+	  // save signals in a file
+	  reader.createSignalsFile(normalizedSignals, mahoutDataFile);
 	  
 	}
 	

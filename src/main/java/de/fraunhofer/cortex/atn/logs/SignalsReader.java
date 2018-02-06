@@ -105,7 +105,7 @@ public class SignalsReader {
    * @param records
    * @return
    */
-  public static Set<String> getStringItemIDs(List<SignalRecord> records) {
+  public Set<String> getStringItemIDs(List<SignalRecord> records) {
     Set<String> stringItemIDs = new HashSet<String>();
     for(SignalRecord record: records) {
       String stringItemID = record.getAtnItemID();
@@ -117,29 +117,51 @@ public class SignalsReader {
   
   
   /**
-   * Group the records by a key (userID and itemID). The number of records 
-   * per key counts as feedbacks.
+   * Group the records by a key (userID and itemID). The value for each pair userId, itemID 
+   * is the sum of all the values collected from the feedback 
    * @param records
    * @return
    * @throws IOException
    */
-  public static List<SignalRecord> groupRecordsByKey(List<SignalRecord> records) throws IOException {
+  public List<SignalRecord> groupRecordsByKey(List<SignalRecord> records) {
     List<SignalRecord> keyedSignals = new ArrayList<SignalRecord>();
     Map<String, List<SignalRecord>> recordsByKey = records.stream()
                     .collect(Collectors.groupingBy(SignalRecord::getKey));
     for (String key: recordsByKey.keySet()) {
       List<SignalRecord> groupRecords = recordsByKey.get(key);
+      double value = groupRecords.stream().collect(Collectors.summingDouble(SignalRecord::getValue));
       SignalRecord record = groupRecords.get(0);
-      SignalRecord signal = new SignalRecord(record.getUserID(), record.getAtnItemID(), 1.0);
-      signal.setValue(groupRecords.size());
+      SignalRecord signal = new SignalRecord(record.getUserID(), record.getAtnItemID(), value);
       keyedSignals.add(signal);
-      //System.out.print("userID: " + feedback.getUserID());
-      //System.out.print(" itemID: " + feedback.getAtnItemID());
-      //System.out.println(" value: " + feedback.getValue());
     }
     
     return keyedSignals;
     
+  }
+  /**
+   * Normalize a list of signals.
+   * @param records
+   * @return
+   */
+  public List<SignalRecord> normalizeList(List<SignalRecord> records) {
+    for(SignalRecord record: records) {
+      double value = record.getValue();
+      double normalizedValue = normalize(value);
+      record.setValue(normalizedValue);    
+    }
+    return records;
+    
+  }
+  /**
+   * Normalize a signals value. If the value of an item computed from a user's feedback
+   * is above the maximum it will be set to the maximum and then normalized in order to be between
+   * -1 and 1. 
+   * @param value
+   * @return
+   */
+  public double normalize(double value) {
+    value = ( value > config.getMaxValue() ) ? config.getMaxValue() : value;
+    return (2*(value - config.getMinValue()) - (config.getMaxValue() - config.getMinValue())) / (config.getMaxValue() - config.getMinValue()); 
   }
   
   /**
@@ -148,7 +170,7 @@ public class SignalsReader {
    * @return
    * @throws FileNotFoundException
    */
-  public static void createSignalsFile(List<SignalRecord> records, File signalsFile) throws FileNotFoundException {
+  public void createSignalsFile(List<SignalRecord> records, File signalsFile) throws FileNotFoundException {
     
       PrintWriter writer = new PrintWriter(new FileOutputStream(signalsFile));
       for (SignalRecord r: records) {
