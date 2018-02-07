@@ -1,4 +1,4 @@
-package de.fraunhofer.cortex.atn.logs;
+package de.fraunhofer.cortex.logs.atn;
 
 import static org.junit.Assert.*;
 
@@ -13,8 +13,8 @@ import org.apache.mahout.cf.taste.impl.common.FastIDSet;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.fraunhofer.cortex.atn.logs.SignalsDataModel;
-import de.fraunhofer.cortex.atn.logs.SignalsFileUtils;
+import de.fraunhofer.cortex.logs.atn.SignalsFileUtils;
+import de.fraunhofer.cortex.recommender.model.SignalsDataModel;
 
 public class SignalDataModelTest {
   

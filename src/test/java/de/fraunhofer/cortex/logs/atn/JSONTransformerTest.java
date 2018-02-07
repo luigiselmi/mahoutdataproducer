@@ -1,4 +1,4 @@
-package de.fraunhofer.cortex.atn.logs;
+package de.fraunhofer.cortex.logs.atn;
 
 import static org.junit.Assert.*;
 
@@ -10,8 +10,9 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.fraunhofer.cortex.atn.logs.JSONTransformer;
-import de.fraunhofer.cortex.atn.logs.SignalRecord;
+import de.fraunhofer.cortex.logs.atn.ApplicationConfig;
+import de.fraunhofer.cortex.logs.atn.JSONTransformer;
+import de.fraunhofer.cortex.logs.atn.SignalRecord;
 
 public class JSONTransformerTest {
 

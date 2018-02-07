@@ -1,4 +1,4 @@
-package de.fraunhofer.cortex.atn.logs;
+package de.fraunhofer.cortex.logs.atn;
 
 import static org.junit.Assert.*;
 
@@ -9,7 +9,7 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.fraunhofer.cortex.atn.logs.SignalsFileUtils;
+import de.fraunhofer.cortex.logs.atn.SignalsFileUtils;
 
 
 public class SignalsFileUtilsTest {

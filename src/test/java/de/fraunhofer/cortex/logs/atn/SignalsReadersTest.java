@@ -1,4 +1,4 @@
-package de.fraunhofer.cortex.atn.logs;
+package de.fraunhofer.cortex.logs.atn;
 
 import static org.junit.Assert.*;
 
@@ -9,8 +9,9 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.fraunhofer.cortex.atn.logs.SignalRecord;
-import de.fraunhofer.cortex.atn.logs.SignalsReader;
+import de.fraunhofer.cortex.logs.atn.ApplicationConfig;
+import de.fraunhofer.cortex.logs.atn.SignalRecord;
+import de.fraunhofer.cortex.logs.atn.SignalsReader;
 
 public class SignalsReadersTest {
 
