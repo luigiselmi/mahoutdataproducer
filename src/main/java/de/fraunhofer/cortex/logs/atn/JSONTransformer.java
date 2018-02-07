@@ -86,18 +86,4 @@ public class JSONTransformer {
     return signals;
   }
 	
-	public void printFile(String filePath) throws MalformedURLException, IOException {
-		InputStream in = new URL( filePath ).openStream();
-		 try {
-		   InputStreamReader inR = new InputStreamReader( in );
-		   BufferedReader buf = new BufferedReader( inR );
-		   String line;
-		   while ( ( line = buf.readLine() ) != null ) {
-		     System.out.println( line );
-		   }
-		 } finally {
-		   in.close();
-		 }
-	}
-  
 }

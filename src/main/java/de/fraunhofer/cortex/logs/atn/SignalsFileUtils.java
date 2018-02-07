@@ -1,7 +1,12 @@
 package de.fraunhofer.cortex.logs.atn;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,5 +35,21 @@ public class SignalsFileUtils {
     }
     return stringItemIDs;
   }
+  
+ 
+  public void printFile(String filePath) throws MalformedURLException, IOException {
+    InputStream in = new URL( filePath ).openStream();
+     try {
+       InputStreamReader inR = new InputStreamReader( in );
+       BufferedReader buf = new BufferedReader( inR );
+       String line;
+       while ( ( line = buf.readLine() ) != null ) {
+         System.out.println( line );
+       }
+     } finally {
+       in.close();
+     }
+  }
+  
 
 }

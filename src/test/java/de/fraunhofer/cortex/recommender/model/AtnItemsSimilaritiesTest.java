@@ -1,4 +1,4 @@
-package de.fraunhofer.cortex.recommender.eval;
+package de.fraunhofer.cortex.recommender.model;
 
 import static org.junit.Assert.*;
 
@@ -9,7 +9,7 @@ import org.apache.mahout.cf.taste.common.TasteException;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.fraunhofer.cortex.recommender.eval.AtnItemsSimilarities;
+import de.fraunhofer.cortex.recommender.model.AtnItemsSimilarities;
 import de.fraunhofer.cortex.recommender.model.SignalsDataModel;
 
 public class AtnItemsSimilaritiesTest {
@@ -29,6 +29,13 @@ public class AtnItemsSimilaritiesTest {
     File similaritiesFile = new File(new File(System.getProperty("java.io.tmpdir")), "similarities.csv");
     AtnItemsSimilarities similarities = new AtnItemsSimilarities();
     similarities.computeSimilarities(model, similaritiesFile, 1, 1);
+  }
+  
+  @Test
+  public void testMapSimilaritiesToStringIDs() throws IOException, TasteException {
+    File similaritiesFile = new File(new File(System.getProperty("java.io.tmpdir")), "similarities.csv");
+    AtnItemsSimilarities similarities = new AtnItemsSimilarities();
+    similarities.mapSimilaritiesToStringIDs(model, similaritiesFile);
   }
 
 }
