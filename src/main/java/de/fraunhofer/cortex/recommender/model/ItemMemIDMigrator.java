@@ -1,4 +1,4 @@
-package de.fraunhofer.cortex.atn.logs;
+package de.fraunhofer.cortex.recommender.model;
 
 import org.apache.mahout.cf.taste.common.TasteException;
 import org.apache.mahout.cf.taste.impl.common.FastByIDMap;

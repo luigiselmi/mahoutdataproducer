@@ -1,4 +1,4 @@
-package de.fraunhofer.cortex.atn.logs;
+package de.fraunhofer.cortex.recommender.model;
 
 import java.io.File;
 import java.io.FileNotFoundException;
