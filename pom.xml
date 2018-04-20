@@ -10,7 +10,7 @@
   </description>
   <properties>
   	<finalName>mahoutdataproducer</finalName>
-  	<main.class>de.fraunhofer.cortex.atn.logs.Main</main.class>
+  	<main.class>de.fraunhofer.cortex.logs.atn.Main</main.class>
   	<maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
