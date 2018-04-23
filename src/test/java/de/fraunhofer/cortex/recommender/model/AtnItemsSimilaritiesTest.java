@@ -19,23 +19,25 @@ public class AtnItemsSimilaritiesTest {
 
   @Before
   public void setUp() throws Exception {
-    signalsFile = new File(this.getClass().getClassLoader().getResource("signals/signals.csv").getFile());
+    signalsFile = new File(this.getClass().getClassLoader().getResource("signals/signals_test.csv").getFile());
     model = new SignalsDataModel(signalsFile);
   }
   
-
+  /*
   @Test
   public void testComputeSimilarities() throws IOException, TasteException {
     File similaritiesFile = new File(new File(System.getProperty("java.io.tmpdir")), "similarities.csv");
     AtnItemsSimilarities similarities = new AtnItemsSimilarities();
     similarities.computeSimilarities(model, similaritiesFile, 1, 1);
   }
-  
+  */
+  /*
   @Test
   public void testMapSimilaritiesToStringIDs() throws IOException, TasteException {
     File similaritiesFile = new File(new File(System.getProperty("java.io.tmpdir")), "similarities.csv");
     AtnItemsSimilarities similarities = new AtnItemsSimilarities();
     similarities.mapSimilaritiesToStringIDs(model, similaritiesFile);
   }
+  */
 
 }
