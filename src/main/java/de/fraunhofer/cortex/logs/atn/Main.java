@@ -37,7 +37,6 @@ public class Main {
     Options options = createOptions();
 	CommandLine cmd = getCommandLine(options, args);
 	String signalsFileName = cmd.getOptionValue(SIGNALS_FILE);
-	//File signalsFile = new File(signalsFileName);
 	// at least one type of signals (views, downloads, comparisons) must be available
 	if(! (cmd.hasOption(VIEWS_FOLDER_OPTION) | 
 	      cmd.hasOption(DOWNLOADS_FOLDER_OPTION) | 
@@ -53,21 +52,21 @@ public class Main {
 	if(cmd.hasOption(VIEWS_FOLDER_OPTION)) {
 	  File dir = new File(cmd.getOptionValue(VIEWS_FOLDER_OPTION));
 	  // read the views log files
-	  List<SignalRecord> viewsRecords = reader.readViewsFiles(dir);
+	  List<SignalRecord> viewsRecords = reader.parseRecursivelyViewFiles(dir);
 	  allSignals.addAll(viewsRecords);
 	}
 	  
 	if(cmd.hasOption(DOWNLOADS_FOLDER_OPTION)) {
       File dir = new File(cmd.getOptionValue(DOWNLOADS_FOLDER_OPTION));
       // read the downloads log files
-      List<SignalRecord> downloadsRecords = reader.readDownloadsFiles(dir);
+      List<SignalRecord> downloadsRecords = reader.parseRecursivelyDownloadFiles(dir);
       allSignals.addAll(downloadsRecords);
     }
 	  
 	if(cmd.hasOption(COMPARISONS_FOLDER_OPTION)) {
       File dir = new File(cmd.getOptionValue(COMPARISONS_FOLDER_OPTION));
       // read the comparisons log files
-      List<SignalRecord> comparisonsRecords = reader.readComparisonsFiles(dir);
+      List<SignalRecord> comparisonsRecords = reader.parseRecursivelyComparisonFiles(dir);
       allSignals.addAll(comparisonsRecords);
     }
 	  
@@ -79,11 +78,12 @@ public class Main {
 	int numUserIDs = reader.getNumUserIDs(keyedSignals);
 	LOG.info("Total number of item IDs: " + numItemIDs);
 	LOG.info("Total number of user IDs: " + numUserIDs);
+	LOG.info("Number of signals (unique userID and itemID): " + keyedSignals.size());
 	  
 	// normalize the values in the signals file
 	List<SignalRecord> normalizedSignals = reader.normalizeList(keyedSignals);
 	  
-	// save signals in a file
+	// save the signals in a file
 	reader.createSignalsFile(normalizedSignals, signalsFileName);
 	  
 	
