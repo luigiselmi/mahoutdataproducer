@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -17,70 +18,78 @@ import org.apache.mahout.cf.taste.common.TasteException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.fraunhofer.cortex.recommender.model.SignalsDataModel;
+
 
 public class Main {
 	
   static final Logger LOG = LoggerFactory.getLogger(Main.class);
 	
   static final String VIEWS_FOLDER_OPTION = "views";
-	static final String DOWNLOADS_FOLDER_OPTION = "downloads";
-	static final String COMPARISONS_FOLDER_OPTION = "comparisons";
-	static final String MAHOUT_DATA_FILE = "output";
+  static final String DOWNLOADS_FOLDER_OPTION = "downloads";
+  static final String COMPARISONS_FOLDER_OPTION = "comparisons";
+  static final String SIGNALS_FILE = "output";
 	
-	private static Options options;
+  private static Options options;
 	
-	public static void main(String[] args) throws IOException, TasteException {
+  public static void main(String[] args) throws IOException, TasteException {
 	  
-	  Options options = createOptions();
-	  CommandLine cmd = getCommandLine(options, args);
-	  String mahoutFileName = cmd.getOptionValue(MAHOUT_DATA_FILE);
-	  File mahoutDataFile = new File(mahoutFileName);
-	  // at least one type of signals (views, downloads, comparisons) must be available
-	  if(! (cmd.hasOption(VIEWS_FOLDER_OPTION) | 
-	        cmd.hasOption(DOWNLOADS_FOLDER_OPTION) | 
-	        cmd.hasOption(COMPARISONS_FOLDER_OPTION))) {
+    Options options = createOptions();
+	CommandLine cmd = getCommandLine(options, args);
+	String signalsFileName = cmd.getOptionValue(SIGNALS_FILE);
+	//File signalsFile = new File(signalsFileName);
+	// at least one type of signals (views, downloads, comparisons) must be available
+	if(! (cmd.hasOption(VIEWS_FOLDER_OPTION) | 
+	      cmd.hasOption(DOWNLOADS_FOLDER_OPTION) | 
+	      cmd.hasOption(COMPARISONS_FOLDER_OPTION))) {
       help(options);
       System.exit(0);
     }
 	  
-	  List<SignalRecord> allSignals = new ArrayList<SignalRecord>();
-	  ApplicationConfig config = readConfiguration();
-	  SignalsReader reader = new SignalsReader(config);
+	List<SignalRecord> allSignals = new ArrayList<SignalRecord>();
+	ApplicationConfig config = readConfiguration();
+	SignalsReader reader = new SignalsReader(config);
 	  
-	  if(cmd.hasOption(VIEWS_FOLDER_OPTION)) {
-	    File dir = new File(cmd.getOptionValue(VIEWS_FOLDER_OPTION));
-	    // read the views log files
-	    List<SignalRecord> viewsRecords = reader.readViewsFiles(dir);
-	    allSignals.addAll(viewsRecords);
-	  }
+	if(cmd.hasOption(VIEWS_FOLDER_OPTION)) {
+	  File dir = new File(cmd.getOptionValue(VIEWS_FOLDER_OPTION));
+	  // read the views log files
+	  List<SignalRecord> viewsRecords = reader.readViewsFiles(dir);
+	  allSignals.addAll(viewsRecords);
+	}
 	  
-	  if(cmd.hasOption(DOWNLOADS_FOLDER_OPTION)) {
+	if(cmd.hasOption(DOWNLOADS_FOLDER_OPTION)) {
       File dir = new File(cmd.getOptionValue(DOWNLOADS_FOLDER_OPTION));
       // read the downloads log files
       List<SignalRecord> downloadsRecords = reader.readDownloadsFiles(dir);
       allSignals.addAll(downloadsRecords);
     }
 	  
-	  if(cmd.hasOption(COMPARISONS_FOLDER_OPTION)) {
+	if(cmd.hasOption(COMPARISONS_FOLDER_OPTION)) {
       File dir = new File(cmd.getOptionValue(COMPARISONS_FOLDER_OPTION));
       // read the comparisons log files
       List<SignalRecord> comparisonsRecords = reader.readComparisonsFiles(dir);
       allSignals.addAll(comparisonsRecords);
     }
 	  
-	  // Aggregate signals, i.e. records with same pair userID and itemID. 
-	  // The total value is the sum of all the values
-	  List<SignalRecord> keyedSignals = reader.groupRecordsByKey(allSignals);
-	  
-	  // normalize the values in the signals file
-	  List<SignalRecord> normalizedSignals = reader.normalizeList(keyedSignals);
-	  
-	  // save signals in a file
-	  reader.createSignalsFile(normalizedSignals, mahoutDataFile);
-	  
-	}
+	// Aggregate signals, i.e. records with same pair userID and itemID. 
+	// The total value is the sum of all the values
+	List<SignalRecord> keyedSignals = reader.groupRecordsByKey(allSignals);
 	
-	private static Options createOptions() {
+	int numItemIDs = reader.getNumItemIDs(keyedSignals);
+	int numUserIDs = reader.getNumUserIDs(keyedSignals);
+	LOG.info("Total number of item IDs: " + numItemIDs);
+	LOG.info("Total number of user IDs: " + numUserIDs);
+	  
+	// normalize the values in the signals file
+	List<SignalRecord> normalizedSignals = reader.normalizeList(keyedSignals);
+	  
+	// save signals in a file
+	reader.createSignalsFile(normalizedSignals, signalsFileName);
+	  
+	
+  }
+	
+  private static Options createOptions() {
 	  options = new Options();
 	  Option signalsFile = new Option("output", true, "path to the output file, mandatory");
 	  signalsFile.setRequired(true);
@@ -123,7 +132,7 @@ public class Main {
   private static ApplicationConfig readConfiguration() throws IOException {
     ApplicationConfig config = new ApplicationConfig();
     Properties prop = new Properties();
-    InputStream configIs = JSONTransformer.class.getClassLoader().getResourceAsStream("config.properties");
+    InputStream configIs = JSONParser.class.getClassLoader().getResourceAsStream("config.properties");
     prop.load(configIs);
     double maxValue = Double.parseDouble(prop.getProperty("value.max"));
     double downloadValue = Double.parseDouble(prop.getProperty("value.download"));

@@ -23,7 +23,7 @@ public class SignalsFileUtilsTest {
 
   @Test
   public void test() throws IOException {
-    Set<String> stringIDs = SignalsFileUtils.getStringItemIDs(signalsFile);
+    Set<String> stringIDs = SignalsFileUtils.getItemIDs(signalsFile);
     assertEquals(2, stringIDs.size());
   }
 

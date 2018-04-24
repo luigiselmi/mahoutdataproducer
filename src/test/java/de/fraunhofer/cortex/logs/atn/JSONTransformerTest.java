@@ -11,7 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.fraunhofer.cortex.logs.atn.ApplicationConfig;
-import de.fraunhofer.cortex.logs.atn.JSONTransformer;
+import de.fraunhofer.cortex.logs.atn.JSONParser;
 import de.fraunhofer.cortex.logs.atn.SignalRecord;
 
 public class JSONTransformerTest {
@@ -20,7 +20,7 @@ public class JSONTransformerTest {
   private File downloadFile;
   private File comparisonFile;
   private ApplicationConfig config;
-  private JSONTransformer transformer;
+  private JSONParser transformer;
   
   @Before
   public void setUp() throws Exception {
@@ -31,7 +31,7 @@ public class JSONTransformerTest {
     config.setValueComparison(2.0);
     config.setValueDownload(2.0);
     config.setValueView(1.0);
-    transformer = new JSONTransformer(config);
+    transformer = new JSONParser(config);
   }
 
   @Test

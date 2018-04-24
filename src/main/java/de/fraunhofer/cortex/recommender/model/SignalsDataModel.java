@@ -34,7 +34,7 @@ public class SignalsDataModel extends FileDataModel {
   
   public SignalsDataModel(File dataFile) throws IOException, TasteException {
     
-    super(dataFile, COLON_DELIMTER); 
+    super(dataFile, false, FileDataModel.DEFAULT_MIN_RELOAD_INTERVAL_MS, COLON_DELIMTER); 
     
   }
   

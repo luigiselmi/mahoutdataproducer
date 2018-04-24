@@ -44,13 +44,15 @@ public class SignalsReadersTest {
   
   @Test
   public void testCreateSignalsFile() throws IOException {
+	String signalsFilePath = System.getProperty("java.io.tmpdir") + "/signals.csv";
+	String normalizedSignalsFilePath = System.getProperty("java.io.tmpdir") + "/normalized_signals.csv";
     File signalsFile = new File(new File(System.getProperty("java.io.tmpdir")), "signals.csv");
     File normalizedSignalsFile = new File(new File(System.getProperty("java.io.tmpdir")), "normalized_signals.csv");
     List<SignalRecord> signals = reader.readViewsFiles(dir);
     List<SignalRecord> keyedSignals = reader.groupRecordsByKey(signals);
-    reader.createSignalsFile(keyedSignals, signalsFile);
+    reader.createSignalsFile(keyedSignals, signalsFilePath);
     List<SignalRecord> normalizedSignals = reader.normalizeList(keyedSignals);
-    reader.createSignalsFile(normalizedSignals, normalizedSignalsFile);
+    reader.createSignalsFile(normalizedSignals, normalizedSignalsFilePath);
   }
   
   @Test

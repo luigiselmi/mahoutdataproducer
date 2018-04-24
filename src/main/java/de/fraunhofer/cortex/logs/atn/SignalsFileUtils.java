@@ -23,7 +23,7 @@ public class SignalsFileUtils {
    * @return
    * @throws IOException 
    */
-  public static Set<String> getStringItemIDs(File dataFile) throws IOException {
+  public static Set<String> getItemIDs(File dataFile) throws IOException {
     Set<String> stringItemIDs = new HashSet<String>();
     List<String> lines = FileUtils.readLines(dataFile, "UTF-8");
     for(String line: lines) {
@@ -34,6 +34,33 @@ public class SignalsFileUtils {
       stringItemIDs.add(stringItemID);
     }
     return stringItemIDs;
+  }
+  
+  /**
+   * Copies the users IDs into an array list
+   * @param records
+   * @return
+   * @throws IOException 
+   */
+  public static Set<String> getUserIDs(File dataFile) throws IOException {
+    Set<String> stringUserIDs = new HashSet<String>();
+    List<String> lines = FileUtils.readLines(dataFile, "UTF-8");
+    for(String line: lines) {
+      int delimiterIndex = line.indexOf(COLON_DELIMTER);
+      String stringItemID = line.substring(0, delimiterIndex);
+      stringUserIDs.add(stringItemID);
+    }
+    return stringUserIDs;
+  }
+  
+  public static int getNumberUserIDs(File dataFile) throws IOException {
+	  Set<String> userIds = getUserIDs(dataFile);
+	  return userIds.size();
+  }
+  
+  public static int getNumberItemIDs(File dataFile) throws IOException {
+	  Set<String> itemIds = getItemIDs(dataFile);
+	  return itemIds.size();
   }
   
  

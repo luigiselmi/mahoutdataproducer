@@ -13,16 +13,19 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class SignalsReader {
-  
-  JSONTransformer transformer = null;
+	
+  static final Logger LOG = LoggerFactory.getLogger(SignalsReader.class);
+  JSONParser transformer = null;
   ApplicationConfig config;
   
   public SignalsReader(ApplicationConfig config) throws IOException {
     this.config = config;
-    transformer = new JSONTransformer(config);
+    transformer = new JSONParser(config);
   }
   
   /**
@@ -105,16 +108,42 @@ public class SignalsReader {
    * @param records
    * @return
    */
-  public Set<String> getStringItemIDs(List<SignalRecord> records) {
-    Set<String> stringItemIDs = new HashSet<String>();
+  public Set<String> getItemIDs(List<SignalRecord> records) {
+    Set<String> itemIDs = new HashSet<String>();
     for(SignalRecord record: records) {
-      String stringItemID = record.getAtnItemID();
-      stringItemIDs.add(stringItemID);
+      String itemID = record.getAtnItemID();
+      itemIDs.add(itemID);
     }
-    return stringItemIDs;
+    return itemIDs;
+  }
+  /**
+   * Returns the number of items in a set of records (userID, itemID, value)
+   * @param records
+   * @return
+   */
+  public int getNumItemIDs(List<SignalRecord> records) {
+	  Set<String> itemIDs = getItemIDs(records);
+	  return itemIDs.size();
   }
   
+  /**
+   * Copies the userIDs in a list of signal records
+   * @param records
+   * @return
+   */
+  public Set<Long> getUserIDs(List<SignalRecord> records) {
+	  Set<Long> userIDs = new HashSet<Long>();
+	  for(SignalRecord record: records) {
+	    long userID = record.getUserID();
+	    userIDs.add(userID);
+	  }
+	  return userIDs;
+  }
   
+  public int getNumUserIDs(List<SignalRecord> records) {
+	  Set<Long> userIDs = getUserIDs(records);
+	  return userIDs.size();
+  }
   
   /**
    * Group the records by a key (userID and itemID). The value for each pair userId, itemID 
@@ -170,9 +199,9 @@ public class SignalsReader {
    * @return
    * @throws FileNotFoundException
    */
-  public void createSignalsFile(List<SignalRecord> records, File signalsFile) throws FileNotFoundException {
+  public void createSignalsFile(List<SignalRecord> records, String signalsFileName) throws FileNotFoundException {
     
-      PrintWriter writer = new PrintWriter(new FileOutputStream(signalsFile));
+      PrintWriter writer = new PrintWriter(new FileOutputStream(new File(signalsFileName)));
       for (SignalRecord r: records) {
         writer.println(r.getUserID() + "," + r.getAtnItemID() + "," + r.getValue());
       }
