@@ -132,7 +132,7 @@ public class Main {
   private static ApplicationConfig readConfiguration() throws IOException {
     ApplicationConfig config = new ApplicationConfig();
     Properties prop = new Properties();
-    InputStream configIs = JSONParser.class.getClassLoader().getResourceAsStream("config.properties");
+    InputStream configIs = Main.class.getClassLoader().getResourceAsStream("config.properties");
     prop.load(configIs);
     double maxValue = Double.parseDouble(prop.getProperty("value.max"));
     double downloadValue = Double.parseDouble(prop.getProperty("value.download"));
@@ -143,5 +143,6 @@ public class Main {
     config.setValueView(viewValue);
     config.setValueComparison(comparisonValue);
     return config;
+   
   }
 }
