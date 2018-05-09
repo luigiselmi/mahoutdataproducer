@@ -14,6 +14,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,41 +33,13 @@ public class SignalsReader {
   }
   
   /**
-   * Extracts userIDs, itemIDs from the views events 
-   * and sets the value to 1.0 from the user.
-   * Stores each event in one record.  
-   * navigation data.
-   * @return
-   * @throws IOException
-   */
-  @Deprecated
-  public List<SignalRecord> readViewsFiles(File dir) throws IOException {
-    List<SignalRecord> signals = new ArrayList<SignalRecord>();
-    File[] logFiles = dir.listFiles();
-    LOG.info("Number of files with view events: " + logFiles.length);
-    for (int i = 0; i < logFiles.length; i++) {
-      if (logFiles[i].isFile()) {
-        List<String> lines = FileUtils.readLines(logFiles[i], "UTF-8");
-        for(String line: lines) {
-          SignalRecord signal = transformer.parseViews(line);
-          signals.add(signal);
-          
-        }
-      
-      }
-    }
-    LOG.info("Number of events of type view: " + signals.size());
-    return signals;
-  }
-  
-  /**
    * Extracts events of type views from the folder passed as argument and its subfolders 
    * @return
    * @throws IOException
    */
-  public List<SignalRecord> parseRecursivelyViewFiles(File dir) throws IOException {
+  public List<SignalRecord> parseRecursivelyViewFiles(File dir, IOFileFilter logFilter) throws IOException {
     List<SignalRecord> signals = new ArrayList<SignalRecord>();
-    Collection<File> logFiles = FileUtils.listFiles(dir, null, true);
+    Collection<File> logFiles = FileUtils.listFiles(dir, logFilter, TrueFileFilter.INSTANCE);
     LOG.info("Number of files with view events: " + logFiles.size());
     for (File logFile: logFiles) {
       if (logFile.isFile()) {
@@ -82,41 +57,13 @@ public class SignalsReader {
   }
   
   /**
-   * Extracts userIDs, itemIDs from the downloads events 
-   * and sets the value to 1.0 from the user.
-   * Stores each event in one record.  
-   * navigation data.
-   * @return
-   * @throws IOException
-   */
-  @Deprecated
-  public List<SignalRecord> readDownloadsFiles(File dir) throws IOException {
-    List<SignalRecord> signals = new ArrayList<SignalRecord>();
-    File[] logFiles = dir.listFiles();
-    LOG.info("Number of files with download events: " + logFiles.length);
-    for (int i = 0; i < logFiles.length; i++) {
-      if (logFiles[i].isFile()) {
-        List<String> lines = FileUtils.readLines(logFiles[i], "UTF-8");
-        for(String line: lines) {
-          SignalRecord signal = transformer.parseDownloads(line);
-          signals.add(signal);
-          
-        }
-      
-      }
-    }
-    LOG.info("Number of events of type download: " + signals.size());
-    return signals;
-  }
-  
-  /**
    * Extracts events of type download from the folder passed as argument and its subfolders 
    * @return
    * @throws IOException
    */
-  public List<SignalRecord> parseRecursivelyDownloadFiles(File dir) throws IOException {
+  public List<SignalRecord> parseRecursivelyDownloadFiles(File dir, IOFileFilter logFilter) throws IOException {
     List<SignalRecord> signals = new ArrayList<SignalRecord>();
-    Collection<File> logFiles = FileUtils.listFiles(dir, null, true);
+    Collection<File> logFiles = FileUtils.listFiles(dir, logFilter, FileFilterUtils.trueFileFilter());
     LOG.info("Number of files with download events: " + logFiles.size());
     for (File logFile: logFiles) {
       if (logFile.isFile()) {
@@ -134,41 +81,13 @@ public class SignalsReader {
   }
   
   /**
-   * Extracts userIDs, itemIDs from the comparison events 
-   * and sets the value to 1.0 from the user for each comparison.
-   * One user generates one event for each item in a comparison. 
-   * navigation data.
-   * @return
-   * @throws IOException
-   */
-  @Deprecated
-  public List<SignalRecord> readComparisonsFiles(File dir) throws IOException {
-    List<SignalRecord> signals = new ArrayList<SignalRecord>();
-    File[] logFiles = dir.listFiles();
-    LOG.info("Number of files with comparison events: " + logFiles.length);
-    for (int i = 0; i < logFiles.length; i++) {
-      if (logFiles[i].isFile()) {
-        List<String> lines = FileUtils.readLines(logFiles[i], "UTF-8");
-        for(String line: lines) {
-          List<SignalRecord> signalsFromOneUser = transformer.parseComparisons(line);
-          signals.addAll(signalsFromOneUser);
-          
-        }
-      
-      }
-    }
-    LOG.info("Number of events of type comparison: " + signals.size());
-    return signals;
-  }
-  
-  /**
    * Extracts events of type comparison from the folder passed as argument and its subfolders 
    * @return
    * @throws IOException
    */
-  public List<SignalRecord> parseRecursivelyComparisonFiles(File dir) throws IOException {
+  public List<SignalRecord> parseRecursivelyComparisonFiles(File dir, IOFileFilter logFilter) throws IOException {
     List<SignalRecord> signals = new ArrayList<SignalRecord>();
-    Collection<File> logFiles = FileUtils.listFiles(dir, null, true);
+    Collection<File> logFiles = FileUtils.listFiles(dir, logFilter, FileFilterUtils.trueFileFilter());
     LOG.info("Number of files with comparison events: " + logFiles.size());
     for (File logFile: logFiles) {
       if (logFile.isFile()) {

@@ -13,7 +13,7 @@ public class ApplicationConfig {
   private double valueDownload = 4.0;
   private double valueView = 3.5;
   private double valueComparison = 4.0;
- 
+    
   public double getMaxValue() {
     return maxValue;
   }
