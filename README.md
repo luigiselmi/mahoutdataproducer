@@ -11,8 +11,7 @@ comparisons. The views are events in which a user has seen the details of an ite
 after a search. A download refers to an event in which a user has downloaded a document related to an item and 
 a comparison is the event in which a user has selected two or more items to make a comparison.
 A recommender based on Apache Mahout reads signals from a base file, e.g. signals.csv, and from other files in the same folder 
-whose name begins in the same way as the base file, say signals-20180424.csv. The signals data are kept in a Mahout FileDataModel 
-and are reloaded after a certain interval, if there has been a change. The folders containing the users' log files
+whose name begins in the same way as the base file, say signals-20180424.csv. The folders containing the users' log files
 are visited recursively. A filter can be used to parse only the files whose name start with a number of 8 digits that represents
 the date in which the file was created in the format yyyymmdd. When the filter is used only the file that start with the same or 
 higher number are parsed.
