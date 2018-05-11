@@ -99,7 +99,7 @@ public class SignalsReader {
       
       }
     }
-    LOG.info("Number of events of type view: " + signals.size());
+    LOG.info("Number of events of type comparison: " + signals.size());
     return signals;  
   }
   
