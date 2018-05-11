@@ -10,9 +10,13 @@ The parser can use different types of user feedbacks, also called signals or obs
 comparisons. The views are events in which a user has seen the details of an item, usually
 after a search. A download refers to an event in which a user has downloaded a document related to an item and 
 a comparison is the event in which a user has selected two or more items to make a comparison.
-A recommeder based on Apache Mahout reads signals from a base file, e.g. signals.csv, and from other files in the same folder 
+A recommender based on Apache Mahout reads signals from a base file, e.g. signals.csv, and from other files in the same folder 
 whose name begins in the same way as the base file, say signals-20180424.csv. The signals data are kept in a Mahout FileDataModel 
-and are reloaded after a certain interval, if there has been a change. 
+and are reloaded after a certain interval, if there has been a change. The folders containing the users' log files
+are visited recursively. A filter can be used to parse only the files whose name start with a number of 8 digits that represents
+the date in which the file was created in the format yyyymmdd. When the filter is used only the file that start with the same or 
+higher number are parsed.
+ 
 
 
 ## Prerequisites 
@@ -32,6 +36,11 @@ From the project's root folder execute the command
 The parser can be run as an executable jar files. At least the path of a folder containing the 
 files of one type of signals must be passed as an argument with the path to the output file. 
  
-    $ java -jar target/mahoutdataproducer-0.0.1-SNAPSHOT-jar-with-dependencies.jar -output signals.csv  -downloads <downloads folder> -views <views folder> -comparisons <comparisons folder>
+    $ java -jar target/mahoutdataproducer-0.1.0-SNAPSHOT-jar-with-dependencies.jar -output signals.csv  -downloads <downloads folder> -views <views folder> -comparisons <comparisons folder>
 
+An optional numerical filter can be used to parse only the file that start with the same number or higher
+as in the example
 
+    $ java -jar target/mahoutdataproducer-0.1.0-SNAPSHOT-jar-with-dependencies.jar -filter 20100511 -output signals.csv  -downloads <downloads folder>
+
+    
