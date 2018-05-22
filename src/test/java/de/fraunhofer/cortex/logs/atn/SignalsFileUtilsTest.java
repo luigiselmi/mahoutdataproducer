@@ -18,13 +18,13 @@ public class SignalsFileUtilsTest {
   
   @Before
   public void setUp() throws Exception {
-    signalsFile = new File(this.getClass().getClassLoader().getResource("signals/signals_test.csv").getFile());
+    signalsFile = new File(this.getClass().getClassLoader().getResource("signals/mahout_example.csv").getFile());
   }
 
   @Test
   public void test() throws IOException {
     Set<String> stringIDs = SignalsFileUtils.getItemIDs(signalsFile);
-    assertEquals(2, stringIDs.size());
+    assertEquals(7, stringIDs.size());
   }
 
 }

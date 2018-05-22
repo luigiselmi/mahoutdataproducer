@@ -12,13 +12,13 @@ import org.junit.Test;
 
 import de.fraunhofer.cortex.logs.atn.ApplicationConfig;
 import de.fraunhofer.cortex.logs.atn.SignalRecord;
-import de.fraunhofer.cortex.logs.atn.SignalsReader;
+import de.fraunhofer.cortex.logs.atn.SignalsBuilder;
 
-public class SignalsReadersTest {
+public class SignalsBuilderTest {
 
   File dir = null;
   private ApplicationConfig config;
-  private SignalsReader reader;
+  private SignalsBuilder builder;
   
   @Before
   public void setUp() throws Exception {
@@ -26,7 +26,7 @@ public class SignalsReadersTest {
     config = new ApplicationConfig();
     config.setMaxValue(5.0);
     config.setMinValue(1.0);
-    reader = new SignalsReader(config);
+    builder = new SignalsBuilder(config);
     
   }
   
@@ -34,27 +34,27 @@ public class SignalsReadersTest {
   public void testCreateSignalsFile() throws IOException {
 	String signalsFilePath = System.getProperty("java.io.tmpdir") + "/signals.csv";
 	String normalizedSignalsFilePath = System.getProperty("java.io.tmpdir") + "/normalized_signals.csv";
-    List<SignalRecord> signals = reader.parseRecursivelyViewFiles(dir, TrueFileFilter.INSTANCE);
-    List<SignalRecord> keyedSignals = reader.groupRecordsByKey(signals);
-    reader.createSignalsFile(keyedSignals, signalsFilePath);
-    List<SignalRecord> normalizedSignals = reader.normalizeList(keyedSignals);
-    reader.createSignalsFile(normalizedSignals, normalizedSignalsFilePath);
+    List<SignalRecord> signals = builder.parseRecursivelyViewFiles(dir, TrueFileFilter.INSTANCE);
+    List<SignalRecord> keyedSignals = builder.groupRecordsByKey(signals);
+    builder.createSignalsFile(keyedSignals, signalsFilePath);
+    List<SignalRecord> normalizedSignals = builder.normalizeList(keyedSignals);
+    builder.createSignalsFile(normalizedSignals, normalizedSignalsFilePath);
   }
   
   @Test
   public void testFilterUserLogFiles() throws IOException {
 	LogFileFilter logFilter = new LogFileFilter(20161128);
 	String filteredSignalsFilePath = System.getProperty("java.io.tmpdir") + "/filtered_signals.csv";
-    List<SignalRecord> signals = reader.parseRecursivelyViewFiles(dir, logFilter);
-    List<SignalRecord> keyedSignals = reader.groupRecordsByKey(signals);
-    List<SignalRecord> normalizedSignals = reader.normalizeList(keyedSignals);
-    reader.createSignalsFile(normalizedSignals, filteredSignalsFilePath);
+    List<SignalRecord> signals = builder.parseRecursivelyViewFiles(dir, logFilter);
+    List<SignalRecord> keyedSignals = builder.groupRecordsByKey(signals);
+    List<SignalRecord> normalizedSignals = builder.normalizeList(keyedSignals);
+    builder.createSignalsFile(normalizedSignals, filteredSignalsFilePath);
   }
   
   @Test
   public void testNormalize() {
-    assertTrue(reader.normalize(4.0) == 0.5);
-    assertTrue(reader.normalize(10.0) == 1.0);
+    assertTrue(builder.normalize(4.0) == 0.5);
+    assertTrue(builder.normalize(10.0) == 1.0);
   }
 
 }
