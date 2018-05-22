@@ -4,9 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.mahout.cf.taste.common.TasteException;
-import org.apache.mahout.cf.taste.impl.recommender.CachingRecommender;
 import org.apache.mahout.cf.taste.impl.recommender.GenericItemBasedRecommender;
 import org.apache.mahout.cf.taste.impl.similarity.GenericItemSimilarity;
 import org.apache.mahout.cf.taste.impl.similarity.PearsonCorrelationSimilarity;
@@ -18,12 +18,12 @@ import org.apache.mahout.cf.taste.similarity.ItemSimilarity;
 import org.apache.mahout.cf.taste.similarity.precompute.BatchItemSimilarities;
 import org.apache.mahout.cf.taste.similarity.precompute.SimilarItemsWriter;
 
-import de.fraunhofer.cortex.logs.atn.SignalsFileUtils;
-
 public class AtnItemsSimilarities {
   
   /**
-   * Computes the similarities from a data model and saves the result in a file.   
+   * Computes the similarities from a data model using Pearson correlation and saves 
+   * the result in a file. The file contains records of item-item pairs with a value 
+   * that represents their similarity.  
    * @param model
    * @param similaritiesFile
    * @param degreeOfParallelism
@@ -38,7 +38,9 @@ public class AtnItemsSimilarities {
                                  int maxDurationInHours) throws IOException, TasteException {
     
     ItemBasedRecommender recommender = new GenericItemBasedRecommender(model, new PearsonCorrelationSimilarity(model));
-    BatchItemSimilarities similarities = new MultithreadedBatchItemSimilarities(recommender, 1, 1);
+	int similarItemsPerItem = 1;
+    BatchItemSimilarities similarities = new MultithreadedBatchItemSimilarities(recommender, similarItemsPerItem);
+    //SimilarItemsWriter writer = new AtnFileSimilarItemsWriter(similaritiesFile, model);
     SimilarItemsWriter writer = new FileSimilarItemsWriter(similaritiesFile);
     int numSimilarities = similarities.computeItemSimilarities(degreeOfParallelism, maxDurationInHours, writer);
     writer.close();
@@ -46,54 +48,55 @@ public class AtnItemsSimilarities {
     
   }
   
-  /**
-   * By default the itemIDs in the similarities are available in long. This method maps
-   * the itemIDs to string and updates the similarities file. It also returns the list of
-   * similarities. 
-   * @param similaritiesFile
-   * @throws TasteException 
-   */
-  public List<GenericItemSimilarity.ItemItemSimilarity> mapSimilaritiesToStringIDs(SignalsDataModel model, File similaritiesFile) throws IOException, TasteException { 
-   List<String> linesString = new ArrayList<String>();
-   List<GenericItemSimilarity.ItemItemSimilarity> similarities = new ArrayList<GenericItemSimilarity.ItemItemSimilarity>();
-   List<String> linesSimilarities = FileUtils.readLines(similaritiesFile, "UTF-8");
-   for(String line: linesSimilarities) {
-     int lastDelimiterStart = line.lastIndexOf(SignalsFileUtils.COLON_DELIMTER);
-     double similarityValue = Double.parseDouble(line.substring(lastDelimiterStart + 1)); 
-     String subRecord = line.substring(0, lastDelimiterStart);
-     int subRecordLastDelimiterStart = subRecord.lastIndexOf(SignalsFileUtils.COLON_DELIMTER);
-     long itemID2 = Long.parseLong(subRecord.substring(subRecordLastDelimiterStart + 1));
-     long itemID1 = Long.parseLong(subRecord.substring(0, subRecordLastDelimiterStart));
-     String stringItemID1 = model.getItemIDAsString(itemID1);
-     String stringItemID2 = model.getItemIDAsString(itemID2);
-     GenericItemSimilarity.ItemItemSimilarity similarity = new GenericItemSimilarity.ItemItemSimilarity(itemID1, itemID2, similarityValue);
-     linesString.add(stringItemID1 +
-         SignalsFileUtils.COLON_DELIMTER + 
-         stringItemID2 + SignalsFileUtils.COLON_DELIMTER +
-         similarityValue);
   
-     similarities.add(similarity);
-   }
-   
-   String filePath = similaritiesFile.getPath();
-   similaritiesFile.delete();
-   FileUtils.writeLines(new File(filePath), "UTF-8", linesString);
-   
-   return similarities;
-    
-  }
   /**
    * Builds an item-based recommender from a similarities file. This is useful when the 
-   * data is large.
+   * data is large. The similarities are records of item-item pairs associated to a value
+   * that represents their similarity. 
    * @param similaritiesFile
    * @return
    * @throws TasteException 
    * @throws IOException 
    */
-  public Recommender buildRecommenderFromSimilarities(SignalsDataModel model, List<GenericItemSimilarity.ItemItemSimilarity> similarities) throws TasteException, IOException {
-    ItemSimilarity similarity = new GenericItemSimilarity(similarities);
-    Recommender recommender = new CachingRecommender(new GenericItemBasedRecommender(model, similarity));
+  public Recommender buildRecommenderFromSimilarities(SignalsDataModel model, File similaritiesFile) throws TasteException, IOException {
+	List<GenericItemSimilarity.ItemItemSimilarity> similarities = getItemSimilarities(similaritiesFile);
+	ItemSimilarity similarity = new GenericItemSimilarity(similarities);
+    Recommender recommender = new GenericItemBasedRecommender(model, similarity);
     return recommender;
   }
+  
+  /**
+   * Returns a list of items similarities as (long, long, double), from a file where they are represented 
+   * in the same format.
+   * @param similaritiesFile
+   * @return
+ * @throws IOException 
+   */
+  public List<GenericItemSimilarity.ItemItemSimilarity> getItemSimilarities(File similaritiesFile) throws IOException {
+	List<GenericItemSimilarity.ItemItemSimilarity> similarities = new ArrayList<GenericItemSimilarity.ItemItemSimilarity>();
+	List<String> lines = FileUtils.readLines(similaritiesFile, "UTF-8");
+	for (String line: lines) {
+		String [] fields = line.split(",");
+		long item1 = Long.parseLong(fields[0]);
+		long item2 = Long.parseLong(fields[1]);
+		double similarityValue = Double.parseDouble(fields[2]);
+		GenericItemSimilarity.ItemItemSimilarity similarity = new GenericItemSimilarity.ItemItemSimilarity(item1, item2, similarityValue);
+		similarities.add(similarity);
+	}
+	
+	return similarities;  
+  }
+  
+  /**
+   * Returns a list of items similarities as (long, long, double), from a file where they are represented 
+   * as (string, string, double), in order to be used by a Mahout recommender.
+   * @param similaritiesFile
+   * @return
+ * @throws IOException 
+   */
+  public List<GenericItemSimilarity.ItemItemSimilarity> getItemSimilaritiesFromString(SignalsDataModel model, File similaritiesFile) throws IOException {
+	return null;  
+  }
+  
 
 }
