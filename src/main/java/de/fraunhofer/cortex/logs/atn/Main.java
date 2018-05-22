@@ -52,14 +52,14 @@ public class Main {
 	  
 	List<SignalRecord> allSignals = new ArrayList<SignalRecord>();
 	ApplicationConfig config = readConfiguration();
-	SignalsReader reader = new SignalsReader(config);
+	SignalsBuilder builder = new SignalsBuilder(config);
 	IOFileFilter logFilter = getLogsFilter(cmd.getOptionValue(LOGS_FILTER_OPTION));
 	  
 	if(cmd.hasOption(VIEWS_FOLDER_OPTION)) {
 	  File dir = new File(cmd.getOptionValue(VIEWS_FOLDER_OPTION));
 	  // read the views log files
 	  if(dir.exists()) {
-		  List<SignalRecord> viewsRecords = reader.parseRecursivelyViewFiles(dir, logFilter);
+		  List<SignalRecord> viewsRecords = builder.parseRecursivelyViewFiles(dir, logFilter);
 		  allSignals.addAll(viewsRecords);
 	  }
 	  else {
@@ -71,7 +71,7 @@ public class Main {
       File dir = new File(cmd.getOptionValue(DOWNLOADS_FOLDER_OPTION));
       // read the downloads log files
       if(dir.exists()) {
-    	  List<SignalRecord> downloadsRecords = reader.parseRecursivelyDownloadFiles(dir, logFilter);
+    	  List<SignalRecord> downloadsRecords = builder.parseRecursivelyDownloadFiles(dir, logFilter);
     	  allSignals.addAll(downloadsRecords);
       }
       else {
@@ -83,7 +83,7 @@ public class Main {
       File dir = new File(cmd.getOptionValue(COMPARISONS_FOLDER_OPTION));
       // read the comparisons log files
       if(dir.exists()) {
-    	  List<SignalRecord> comparisonsRecords = reader.parseRecursivelyComparisonFiles(dir, logFilter);
+    	  List<SignalRecord> comparisonsRecords = builder.parseRecursivelyComparisonFiles(dir, logFilter);
     	  allSignals.addAll(comparisonsRecords);
       }
       else {
@@ -93,19 +93,19 @@ public class Main {
 	  
 	// Aggregate signals, i.e. records with same pair userID and itemID. 
 	// The total value is the sum of all the values
-	List<SignalRecord> keyedSignals = reader.groupRecordsByKey(allSignals);
+	List<SignalRecord> keyedSignals = builder.groupRecordsByKey(allSignals);
 	
-	int numItemIDs = reader.getNumItemIDs(keyedSignals);
-	int numUserIDs = reader.getNumUserIDs(keyedSignals);
+	int numItemIDs = builder.getNumItemIDs(keyedSignals);
+	int numUserIDs = builder.getNumUserIDs(keyedSignals);
 	LOG.info("Total number of item IDs: " + numItemIDs);
 	LOG.info("Total number of user IDs: " + numUserIDs);
 	LOG.info("Number of signals (unique userID and itemID): " + keyedSignals.size());
 	  
 	// normalize the values in the signals file
-	List<SignalRecord> normalizedSignals = reader.normalizeList(keyedSignals);
+	List<SignalRecord> normalizedSignals = builder.normalizeList(keyedSignals);
 	  
 	// save the signals in a file
-	reader.createSignalsFile(normalizedSignals, signalsFileName);
+	builder.createSignalsFile(normalizedSignals, signalsFileName);
 	  
 	
   }
