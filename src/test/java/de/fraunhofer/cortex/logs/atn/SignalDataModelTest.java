@@ -23,13 +23,13 @@ public class SignalDataModelTest {
 
   @Before
   public void setUp() throws Exception {
-    signalsFile = new File(this.getClass().getClassLoader().getResource("signals/signals_test.csv").getFile());
+    signalsFile = new File(this.getClass().getClassLoader().getResource("signals/atn_signals.csv").getFile());
     model = new SignalsDataModel(signalsFile);
   }
 
   @Test
   public void testGetItemIDsFromUser() throws TasteException, IOException {
-    FastIDSet itemIDs = model.getItemIDsFromUser(1);
+    FastIDSet itemIDs = model.getItemIDsFromUser(20159);
     Iterator<Long> i = itemIDs.iterator();
     while(i.hasNext()) {
       long itemID = i.next();
