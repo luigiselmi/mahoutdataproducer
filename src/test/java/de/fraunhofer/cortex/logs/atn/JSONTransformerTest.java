@@ -40,8 +40,10 @@ public class JSONTransformerTest {
     System.out.println("Test parsing view events");
     for(String line: lines) {
       SignalRecord record = transformer.parseViews(line);
-      System.out.println("  User ID: " + record.getUserID());
-      System.out.print("Item ID: " + record.atnItemID);
+      System.out.print("User ID: " + record.getUserID());
+      System.out.print(" Item ID: " + record.atnItemID);
+      System.out.println(" Component Type: " + record.getComponentType());
+      
     }
   }
   
@@ -51,8 +53,9 @@ public class JSONTransformerTest {
     System.out.println("Test parsing download events");
     for(String line: lines) {
       SignalRecord record = transformer.parseDownloads(line);
-      System.out.println(" User ID: " + record.getUserID());
-      System.out.print("Item ID: " + record.atnItemID);
+      System.out.print("User ID: " + record.getUserID());
+      System.out.print(" Item ID: " + record.atnItemID);
+      System.out.println("Component Type: " + record.getComponentType());
     }
   }
   
@@ -64,7 +67,8 @@ public class JSONTransformerTest {
       List<SignalRecord> records = transformer.parseComparisons(line);
       for(SignalRecord r: records) {
         System.out.print("User ID: " + r.getUserID());
-        System.out.println(" Item ID: " + r.getAtnItemID());
+        System.out.print(" Item ID: " + r.getAtnItemID());
+        System.out.println(" Component Type: " + r.getComponentType());
       }
     }
   }
