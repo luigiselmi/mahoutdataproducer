@@ -6,14 +6,17 @@ public class SignalRecord implements Comparable<SignalRecord> {
   long userID;
   String atnItemID;
   double value;
+  String family; //additional info for content-based filtering
+  String style; //additional info for content-based filtering
+  String familyPath; //additional info for content-based filtering
+  String componentType; // one of family or familyPath
   String key;
   
-  public SignalRecord(long userID, String atnItemID, double value) {
+  public SignalRecord(long userID, String atnItemID) {
     if(userID < 0 || atnItemID == null)
       throw new NullPointerException();
     this.userID = userID;
     this.atnItemID = atnItemID;
-    this.value = value;
     this.key = Long.toString(userID) + atnItemID;
   }
   
@@ -33,6 +36,38 @@ public class SignalRecord implements Comparable<SignalRecord> {
     this.value = value;
   }
   
+  public String getFamily() {
+	return family;
+  }
+
+  public void setFamily(String family) {
+	this.family = family;
+  }
+
+  public String getStyle() {
+	return style;
+  }
+
+  public void setStyle(String style) {
+	this.style = style;
+  }
+  
+  public String getFamilyPath() {
+	return familyPath;
+  }
+
+  public void setFamilyPath(String familyPath) {
+	this.familyPath = familyPath;
+  }
+  
+  public String getComponentType() {
+	return componentType;
+  }
+
+  public void setComponentType(String componentType) {
+	this.componentType = componentType;
+  }
+
   public String getKey() {
     return key;
   }
