@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -21,15 +23,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class SignalsReader {
+public class SignalsBuilder {
 	
-  static final Logger LOG = LoggerFactory.getLogger(SignalsReader.class);
-  JSONParser transformer = null;
+  static final Logger LOG = LoggerFactory.getLogger(SignalsBuilder.class);
+  JSONParser parser = null;
   ApplicationConfig config;
   
-  public SignalsReader(ApplicationConfig config) throws IOException {
+  public SignalsBuilder(ApplicationConfig config) throws IOException {
     this.config = config;
-    transformer = new JSONParser(config);
+    parser = new JSONParser(config);
   }
   
   /**
@@ -45,7 +47,7 @@ public class SignalsReader {
       if (logFile.isFile()) {
         List<String> lines = FileUtils.readLines(logFile, "UTF-8");
         for(String line: lines) {
-          SignalRecord signal = transformer.parseViews(line);
+          SignalRecord signal = parser.parseViews(line);
           signals.add(signal);
           
         }
@@ -69,7 +71,7 @@ public class SignalsReader {
       if (logFile.isFile()) {
         List<String> lines = FileUtils.readLines(logFile, "UTF-8");
         for(String line: lines) {
-          SignalRecord signal = transformer.parseDownloads(line);
+          SignalRecord signal = parser.parseDownloads(line);
           signals.add(signal);
           
         }
@@ -93,10 +95,9 @@ public class SignalsReader {
       if (logFile.isFile()) {
         List<String> lines = FileUtils.readLines(logFile, "UTF-8");
         for(String line: lines) {
-          List<SignalRecord> signalsFromOneUser = transformer.parseComparisons(line);
+          List<SignalRecord> signalsFromOneUser = parser.parseComparisons(line);
           signals.addAll(signalsFromOneUser);    
         }
-      
       }
     }
     LOG.info("Number of events of type comparison: " + signals.size());
@@ -160,7 +161,9 @@ public class SignalsReader {
       List<SignalRecord> groupRecords = recordsByKey.get(key);
       double value = groupRecords.stream().collect(Collectors.summingDouble(SignalRecord::getValue));
       SignalRecord record = groupRecords.get(0);
-      SignalRecord signal = new SignalRecord(record.getUserID(), record.getAtnItemID(), value);
+      SignalRecord signal = new SignalRecord(record.getUserID(), record.getAtnItemID());
+      signal.setValue(value);
+      signal.setComponentType(record.getComponentType());
       keyedSignals.add(signal);
     }
     
@@ -201,9 +204,15 @@ public class SignalsReader {
    */
   public void createSignalsFile(List<SignalRecord> records, String signalsFileName) throws FileNotFoundException {
     
+	  long timestamp = Instant.now().toEpochMilli();
+	  
       PrintWriter writer = new PrintWriter(new FileOutputStream(new File(signalsFileName)));
       for (SignalRecord r: records) {
-        writer.println(r.getUserID() + "," + r.getAtnItemID() + "," + r.getValue());
+        writer.println(r.getUserID() + "," + 
+                       r.getAtnItemID() + "," + 
+        		       r.getValue() + "," + 
+        		       timestamp + "," +
+        		       r.getComponentType());
       }
       writer.flush();
       writer.close();
