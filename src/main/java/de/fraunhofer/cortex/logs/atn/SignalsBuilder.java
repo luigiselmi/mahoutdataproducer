@@ -44,14 +44,17 @@ public class SignalsBuilder {
     Collection<File> logFiles = FileUtils.listFiles(dir, logFilter, TrueFileFilter.INSTANCE);
     LOG.info("Number of files with view events: " + logFiles.size());
     for (File logFile: logFiles) {
-      if (logFile.isFile()) {
-        List<String> lines = FileUtils.readLines(logFile, "UTF-8");
-        for(String line: lines) {
-          SignalRecord signal = parser.parseViews(line);
-          signals.add(signal);
-          
+      try {	
+        if (logFile.isFile()) {
+          List<String> lines = FileUtils.readLines(logFile, "UTF-8");
+          for(String line: lines) {
+            SignalRecord signal = parser.parseViews(line);
+            signals.add(signal);
+          }
         }
-      
+      }
+      catch(NullPointerException npe) {
+        	LOG.error("Parsing error for file: " + logFile.getAbsolutePath());
       }
     }
     LOG.info("Number of events of type view: " + signals.size());
@@ -68,16 +71,20 @@ public class SignalsBuilder {
     Collection<File> logFiles = FileUtils.listFiles(dir, logFilter, FileFilterUtils.trueFileFilter());
     LOG.info("Number of files with download events: " + logFiles.size());
     for (File logFile: logFiles) {
-      if (logFile.isFile()) {
-        List<String> lines = FileUtils.readLines(logFile, "UTF-8");
-        for(String line: lines) {
-          SignalRecord signal = parser.parseDownloads(line);
-          signals.add(signal);
-          
+      try {
+    	if (logFile.isFile()) {
+          List<String> lines = FileUtils.readLines(logFile, "UTF-8");
+          for(String line: lines) {
+            SignalRecord signal = parser.parseDownloads(line);
+            signals.add(signal);
+          }
         }
-      
+      }
+      catch(NullPointerException npe) {
+      	LOG.error("Parsing error for file: " + logFile.getAbsolutePath());
       }
     }
+    
     LOG.info("Number of events of type download: " + signals.size());
     return signals;  
   }
@@ -92,12 +99,17 @@ public class SignalsBuilder {
     Collection<File> logFiles = FileUtils.listFiles(dir, logFilter, FileFilterUtils.trueFileFilter());
     LOG.info("Number of files with comparison events: " + logFiles.size());
     for (File logFile: logFiles) {
-      if (logFile.isFile()) {
-        List<String> lines = FileUtils.readLines(logFile, "UTF-8");
-        for(String line: lines) {
-          List<SignalRecord> signalsFromOneUser = parser.parseComparisons(line);
-          signals.addAll(signalsFromOneUser);    
+      try {
+        if (logFile.isFile()) {
+          List<String> lines = FileUtils.readLines(logFile, "UTF-8");
+          for(String line: lines) {
+            List<SignalRecord> signalsFromOneUser = parser.parseComparisons(line);
+            signals.addAll(signalsFromOneUser);    
+          }
         }
+      }
+      catch(NullPointerException npe) {
+        	LOG.error("Parsing error for file: " + logFile.getAbsolutePath());
       }
     }
     LOG.info("Number of events of type comparison: " + signals.size());
